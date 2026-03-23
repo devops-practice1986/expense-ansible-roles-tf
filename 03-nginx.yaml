@@ -1,0 +1,19 @@
+- name: nginx install and run
+  hosts: all
+  become: yes # true / yes
+  # serial: 3 # it will take 3 after 3 ....
+  tasks: 
+# task 1
+  - name: install nginx
+    ansible.builtin.package: # heterogenous module that can work for all distro  
+      name: nginx
+      state: present
+
+  # task 2    
+
+  - name: run nginx
+    ansible.builtin.service:
+      name: nginx
+      state: started
+      enabled: yes
+
