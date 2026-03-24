@@ -5,7 +5,7 @@
   hosts: all
   become:  yes
   vars_files:
-  - "variable-{{ environment }}.yaml" # this is ansible server
+  - "variables-{{ environment }}.yaml" # this is ansible server
 
   roles:
   - "{{ component }}"
