@@ -1,11 +1,10 @@
-# we must pass 2 variables
+# We must pass 2 variables
 # 1. component
 # 2. environment
 - name: "configure {{ component }} server"
   hosts: all
-  become:  yes
+  become: yes
   vars_files:
-  - "variables-{{ environment }}.yaml" # this is ansible server
-
+  - "variables-{{ environment }}.yaml"
   roles:
   - "{{ component }}"
