@@ -1,54 +1,63 @@
----
-- ansible.builtin.pip:
-    executable: pip3.9
+- name: ansible to install pymysql
+  ansible.builtin.pip:
     name:
-      - PyMySQL
-      - cryptography
-  name: ansible to install pymysql
-- ansible.builtin.command: dnf module disable nodejs -y
-  name: disable default nodjs
-- ansible.builtin.command: dnf module enable nodejs:20 -y
-  name: enable nodejs:20
-- ansible.builtin.package:
-    name: {{ item }}
+    - PyMySQL
+    - cryptography
+    executable: pip3.9
+
+- name: disable default nodjs
+  ansible.builtin.command: dnf module disable nodejs -y
+
+- name: enable nodejs:20
+  ansible.builtin.command: dnf module enable nodejs:20 -y
+
+- name: install nodejs
+  ansible.builtin.package:
+    name: "{{ item }}"
     state: present
   loop:
-    - nodejs
-    - mysql
-  name: install nodejs
-- ansible.builtin.user:
+  - nodejs
+  - mysql
+
+- name: create expense user
+  ansible.builtin.user:
     name: expense
-  name: create expense user
-- ansible.builtin.import_role:
+
+- name: import task from common role
+  tags: 
+  - deployment
+  ansible.builtin.import_role:
     name: common
     tasks_from: app-pre-req
-  name: import task from common role
-  tags:
-    - deployment
-- ansible.builtin.command: npm install
+
+- name: install dependencies
+  tags: 
+  - deployment
+  ansible.builtin.command: npm install
   args:
     chdir: /app
-  name: install dependencies
-  tags:
-    - deployment
--   #ansible.builtin.copy:
-ansible.builtin.template:
+
+- name: Copy backend service # copy only works for files without variables
+  #ansible.builtin.copy:
+  ansible.builtin.template:
+    src: backend.service.j2 # here file name is changed with .j2
     dest: /etc/systemd/system/backend.service
-    src: backend.service.j2
-  name: Copy backend service
-- community.mysql.mysql_db:
-    login_host: {{ login_host }}
-    login_password: {{ mysql_root_password }}
+
+- name: import mysql data
+  community.mysql.mysql_db:
     login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: "{{ login_host }}"
+    target: /app/schema/backend.sql
     name: all
     state: import
-    target: /app/schema/backend.sql
-  name: import mysql data
-- ansible.builtin.systemd_service:
+
+- name: daemon reload
+  tags: 
+  - deployment
+  ansible.builtin.systemd_service:
     daemon_reload: true
-    enabled: true
-    name: backend
     state: restarted
-  name: daemon reload
-  tags:
-    - deployment
+    name: backend
+    enabled: true
+    
