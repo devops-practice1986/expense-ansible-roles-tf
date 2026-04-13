@@ -1,3 +1,5 @@
 BACKEND_HOST: backend.app-dev.inspiredevops.online
 app_location: /usr/share/nginx/html
 component: frontend
+
+
