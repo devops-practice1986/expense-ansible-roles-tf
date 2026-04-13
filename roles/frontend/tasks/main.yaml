@@ -3,24 +3,23 @@
     name: nginx
     state: present
 
-- name: start nginx server
-  ansible.builtin.service:
-    name: nginx
-    state: started
-    enabled: yes
-
 - name: import task from common role
   ansible.builtin.import_role:
     name: common
     tasks_from: app-pre-req
 
 - name: Copy expense conf
-  #ansible.builtin.copy:
   ansible.builtin.template:
-    src: expense.conf.j2 
+    src: expense.conf.j2
     dest: /etc/nginx/default.d/expense.conf
-  notify: 
-  - Restart nginx
+  notify:
+    - Restart nginx
+
+- name: start nginx server
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
 
 # - name: remove html directory
 #   ansible.builtin.file:
